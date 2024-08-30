@@ -1,2 +1,0 @@
-# BajajFiserv
-Hackathon project
