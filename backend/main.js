@@ -9,7 +9,12 @@ dotenv.config({
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // The frontend URL you're working with
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:8000",
+      "http://localhost:8000",
+      "*",
+    ], // List of allowed origins
     credentials: true, // If you're dealing with cookies, authentication, etc.
   })
 );
