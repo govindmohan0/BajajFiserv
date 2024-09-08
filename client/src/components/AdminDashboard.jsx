@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { Oval } from 'react-loader-spinner';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false); // State to control loader
 
   useEffect(() => {
     fetch("http://localhost:8000/api")
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched users:", data); // Log the fetched data
+        console.log("Fetched users:", data);
         setUsers(data);
       })
       .catch((error) => console.error("Error fetching data:", error));
@@ -15,23 +17,36 @@ const AdminDashboard = () => {
 
   const handleMLAlgorithm = async (userId) => {
     console.log(`Running ML algorithm for user ID: ${userId}`);
+    setLoading(true); // Show the loader
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/convert/${userId}`, {
-        method: "POST",
-      });
-      const data = await response.json();
+        const response = await fetch(`http://127.0.0.1:8000/process_convert/${userId}`, {
+            method: "POST",
+        });
 
-      if (response.ok) {
-        console.log("Extracted Text:", data.text);
-        alert("Text extracted successfully");
-      } else {
-        console.error("Error:", data.error || "Failed to process the request");
-        alert("Error processing the request");
-      }
+        if (response.ok) {
+            const blob = await response.blob(); // Get the CSV file as a blob
+            console.log("CSV file generated successfully");
+
+            // Automatically download the CSV file
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = 'output.csv'; // Set the filename
+            document.body.appendChild(downloadLink);
+            downloadLink.click(); // Automatically trigger the download
+            document.body.removeChild(downloadLink); // Clean up
+
+            alert("CSV file downloaded successfully");
+        } else {
+            const data = await response.json();
+            console.error("Error:", data.detail || "Failed to process the request");
+            alert("Error processing the request: " + (data.detail || "Unknown error"));
+        }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error processing the request");
+        console.error("Error:", error);
+        alert("Error processing the request");
+    } finally {
+        setLoading(false); // Hide the loader
     }
   };
 
@@ -56,13 +71,11 @@ const AdminDashboard = () => {
       .then((response) => {
         if (response.ok) {
           console.log(`User ID ${userId} deleted successfully`);
-          alert("Item deleted"); // Show alert on successful deletion
+          alert("Item deleted");
         } else {
           return response.json().then((errorData) => {
             console.error("Failed to delete user:", errorData);
-            // Revert the optimistic update if the delete failed
             setUsers((prevUsers) => {
-              // Find the user by userId
               const revertedUser = prevUsers.find((user) => user.id === userId);
               console.log(
                 "Reverting optimistic update, adding user back:",
@@ -75,9 +88,7 @@ const AdminDashboard = () => {
       })
       .catch((error) => {
         console.error("Error deleting user:", error);
-        // Revert the optimistic update if there was an error
         setUsers((prevUsers) => {
-          // Find the user by userId
           const revertedUser = prevUsers.find((user) => user.id === userId);
           console.log(
             "Reverting optimistic update, adding user back:",
@@ -93,6 +104,24 @@ const AdminDashboard = () => {
       <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
         Admin Dashboard
       </h1>
+      
+      {/* Loader Display */}
+      {loading && (
+        <div className="flex justify-center items-center mb-8">
+          <Oval
+            height={50}
+            width={50}
+            color="blue"
+            wrapperStyle={{}}
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#4f46e5"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
+
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-800 text-white">
@@ -127,7 +156,7 @@ const AdminDashboard = () => {
                     onClick={() => handleMLAlgorithm(user.id || user._id)}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
                   >
-                    Run Algorithm
+                    Run Algorithm and download
                   </button>
                   <button
                     onClick={() => handleDeleteUser(user.id || user._id)}

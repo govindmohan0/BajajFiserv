@@ -1,24 +1,38 @@
 import os
 import json
 import requests
+import csv
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+import openpyxl
+import google.generativeai as genai
+from tempfile import NamedTemporaryFile
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import io
+import logging
 
+# Load environment variables
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+# Configure the Gemini API
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 app = FastAPI()
 
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=["*"],  # Allow all origins (change in production)
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # MongoDB connection
@@ -30,12 +44,13 @@ PSPDFKIT_API_KEY = os.getenv('PSPDFKIT_API_KEY')
 LLMWHISPERER_API_KEY = os.getenv('LLMWHISPERER_API_KEY')
 LLMWHISPERER_API_URL = os.getenv('LLMWHISPERER_API_URL')
 
+
 @app.get("/")
 def index():
     return {"message": "Welcome to the FastAPI server!"}
 
-@app.post("/convert/{user_id}")
-async def convert_document(user_id: str):
+@app.post("/process_convert/{user_id}")
+async def process_convert(user_id: str):
     try:
         # Fetch user data from MongoDB
         user = users_collection.find_one({"_id": ObjectId(user_id)})
@@ -75,8 +90,9 @@ async def convert_document(user_id: str):
         if not pspdfkit_response.ok:
             raise HTTPException(status_code=pspdfkit_response.status_code, detail="Failed to convert image to PDF.")
 
-        pdf_path = './assets/result.pdf'
-        with open(pdf_path, 'wb') as pdf_file:
+        # Save the PDF to a temporary file
+        with NamedTemporaryFile(delete=False, suffix=".pdf") as pdf_file:
+            pdf_path = pdf_file.name
             for chunk in pspdfkit_response.iter_content(chunk_size=8096):
                 pdf_file.write(chunk)
 
@@ -97,7 +113,7 @@ async def convert_document(user_id: str):
             )
 
         if whisper_response.status_code == 200:
-            return {"text": whisper_response.text}
+            extracted_text = whisper_response.text
         elif whisper_response.status_code == 202:
             return {
                 "message": "Processing time exceeded. Use the status API.",
@@ -105,10 +121,115 @@ async def convert_document(user_id: str):
             }
         else:
             raise HTTPException(status_code=whisper_response.status_code, detail="Failed to extract text from PDF.")
+        
+        print(extracted_text)
+
+        # Generate the JSON structure using Gemini API
+        json_response = model.generate_content(
+            "From the following text: {}, generate a structured JSON that follows this format: {{"
+            "\"Name_of_treating_Doctor\": null, "
+            "\"Contact_number\": null, "
+            "\"Nature_of_Illness\": null, "
+            "\"Relevant_Critical_Findings\": null, "
+            "\"Duration_of_present_ailment\": null, "
+            "\"Date_of_First_consultation\": null, "
+            "\"Past_history_of_present_ailment\": null, "
+            "\"Provisional_diagnosis\": null, "
+            "\"ICD_10_code\": null, "
+            "\"Medical_Management\": null, "
+            "\"Surgical_Management\": null, "
+            "\"Intensive_Care\": null, "
+            "\"Investigation\": null, "
+            "\"Non_allopathic_treatment\": null, "
+            "\"Route_of_Drug_Administration\": null, "
+            "\"Name_of_surgery\": null, "
+            "\"ICD_10_PCS_code\": null, "
+            "\"Other_treatment_details\": null, "
+            "\"How_did_injury_occur\": null, "
+            "\"Injury_Cause_is_RTA\": null, "
+            "\"Date_of_Injury\": null, "
+            "\"Report_to_Police\": null, "
+            "\"FIR_number\": null, "
+            "\"Substance_abuse\": null, "
+            "\"Test_conducted\": null, "
+            "\"Maternity_is_G\": null, "
+            "\"Maternity_is_P\": null, "
+            "\"Maternity_is_A\": null, "
+            "\"Expected_date_of_delivery\": null "
+            "}}".format(extracted_text)
+        )
+
+
+        generated_content = json_response.candidates[0].content.parts[0].text
+
+        # Print the extracted text
+        print(generated_content)
+
+        if generated_content is None:
+            raise HTTPException(status_code=500, detail="Failed to retrieve content from the Gemini API response.")
+
+        # Clean the data
+        cleaned_content = generated_content.replace('```json\n', '').replace('\n```', '')
+
+        # Convert to a dictionary and remove null fields
+        json_data = json.loads(cleaned_content)
+        cleaned_json_data = {k: v for k, v in json_data.items() if v is not None}
+
+        # Print the cleaned JSON
+        print(json.dumps(cleaned_json_data, indent=4))
+
+        # Now parse the cleaned content as JSON
+        try:
+            generated_json = json.loads(cleaned_content)
+            print(generated_json)
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=500, detail=f"Failed to decode JSON: {e}")
+
+        # Save JSON to a file in 'constants' folder
+        constants_folder = os.path.join(os.getcwd(), 'constants')
+        os.makedirs(constants_folder, exist_ok=True)
+        json_file_path = os.path.join(constants_folder, 'data.json')
+        
+        print("JSON generated successfully")
+        
+        with open(json_file_path, 'w') as json_file:
+            json.dump(generated_json, json_file, indent=4)
+
+        # Convert JSON to CSV
+        csv_file_path = os.path.join(constants_folder, 'data.csv')
+
+        def flatten_json(nested_json, parent_key='', sep='_'):
+            """Flatten nested JSON into a single dictionary."""
+            flattened_dict = {}
+            for key, value in nested_json.items():
+                new_key = parent_key + sep + key if parent_key else key
+                if isinstance(value, dict):
+                    flattened_dict.update(flatten_json(value, new_key, sep=sep))
+                elif isinstance(value, list):
+                    for i, item in enumerate(value):
+                        flattened_dict.update(flatten_json({f'{i}': item}, new_key, sep=sep))
+                else:
+                    flattened_dict[new_key] = value
+            return flattened_dict
+
+        with open(csv_file_path, 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            
+            # Flatten the JSON and extract the keys (for headers) and values
+            flattened_json = flatten_json(generated_json)
+            
+            # Write headers
+            csv_writer.writerow(flattened_json.keys())
+            
+            # Write the corresponding values
+            csv_writer.writerow(flattened_json.values())
+
+        # Return the CSV file for download
+        return FileResponse(csv_file_path, media_type='text/csv', filename="data.csv")
 
     except Exception as e:
+        logging.error("An error occurred in process_convert: %s", str(e))
         raise HTTPException(status_code=500, detail=str(e))
-
 
 if __name__ == "__main__":
     import uvicorn
