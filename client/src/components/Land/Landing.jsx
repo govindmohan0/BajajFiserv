@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -27,8 +28,8 @@ const Landing = () => {
         <div className="text-center">
           <h1 className="text-6xl font-extrabold mb-6">Empower Your Future</h1>
           <p className="text-lg mb-10">Unlock the potential of good advice and smart investments.</p>
-          <Link to="/upload" className="bg-white text-indigo-600 px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition">
-            Upload Your Docs Here
+          <Link to="/getstarted" className="bg-white text-indigo-600 px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition">
+            Get started
           </Link>
         </div>
       </div>

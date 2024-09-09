@@ -1,17 +1,20 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Land/Navbar';
 import Home from './components/Land/Home';
-import Services from './components/Land/Services';
+
 import About from './components/Land/About';
-import Testimonials from './components/Land/Testimonials';
+import Tests from './components/Land/Tests';
 import Contact from './components/Land/Contact';
 import Notfound from './components/Land/Notfound';
 import Uploadclient from './components/Uploadclient';
-import Admin from './components/Admin';
-import Login from './components/Login';
+import Admin from './components/Auth/Admin';
+import Login from './components/Auth/Login';
 import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute'; // Ensure the path is correct
+import ProtectedRoute from './components/Auth/ProtectedRoute'; // Ensure the path is correct
+import GetStarted from './components/GetStarted';
+import Login_Client from './components/Auth/Login_Client';
 
 function App() {
   return (
@@ -20,13 +23,14 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/services" element={<Services />} />
           <Route path="/about" element={<About />} />
-          <Route path="/testimonials" element={<Testimonials />} />
+          <Route path="/tests" element={<Tests />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/upload" element={<Uploadclient />} />
           <Route path="*" element={<Notfound />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login-admin" element={<Login />} />
+          <Route path="/getstarted" element={<GetStarted />} />
+          <Route path="/login-client" element={<Login_Client />} />
           <Route
             path="/admin"
             element={
