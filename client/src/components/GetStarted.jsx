@@ -45,7 +45,7 @@ const GetStarted = () => {
         </Link>
         <div className="text-center mt-4">
           <p className="text-gray-600">Don’t have an account?</p>
-          <Link to="/signup-admin" className="text-blue-500 font-bold">
+          <Link to="#" className="text-blue-500 font-bold">
             Request admin access.
           </Link>
         </div>

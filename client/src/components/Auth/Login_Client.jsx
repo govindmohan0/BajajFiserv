@@ -112,7 +112,7 @@ const Login_Client = () => {
           <div className="text-center mt-6">
             <p className="text-blue-600">
               Don’t have an account?{' '}
-              <a href="#" className="font-semibold hover:underline">Sign up</a>.
+              <a href="/signup-client" className="font-semibold hover:underline">Sign up</a>.
             </p>
           </div>
         </div>
