@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import AdminDashboard from './AdminDashboard'; // Import the AdminDashboard component
 import './Admin.css'; // Import CSS for styling
 
