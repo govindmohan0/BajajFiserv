@@ -16,13 +16,13 @@ const Dropdown = () => {
     ];
 
     return (
-        <div className="flex flex-row-reverse items-start space-x-8 bg-purple-50 py-10">
-            <div className="flex-2 w-full max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-lg mt-14 px-10 border border-purple-200">
-                <h2 className="text-3xl font-bold text-center mb-8 text-purple-600">Got Questions? We're Here to Help!</h2>
+        <div className="flex flex-row-reverse items-start space-x-8 bg-blue-50 py-10">
+            <div className="flex-2 w-full max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-lg mt-14 px-10 border border-blue-200">
+                <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">Got Questions? We're Here to Help!</h2>
                 {dropdownData.map((item, index) => (
                     <div key={index} className="mb-6">
                         <div
-                            className="cursor-pointer py-4 px-6 bg-purple-500 rounded-lg shadow-md flex justify-between items-center transition-transform duration-300 ease-in-out transform hover:bg-purple-400"
+                            className="cursor-pointer py-4 px-6 bg-blue-500 rounded-lg shadow-md flex justify-between items-center transition-transform duration-300 ease-in-out transform hover:bg-blue-400"
                             onClick={() => toggleDropdown(index)}
                             aria-expanded={activeIndex === index}
                             aria-controls={`dropdown-content-${index}`}
@@ -34,7 +34,7 @@ const Dropdown = () => {
                         </div>
                         <div
                             id={`dropdown-content-${index}`}
-                            className={`mt-3 px-6 py-4 bg-purple-100 text-purple-700 rounded-lg shadow-md transition-all duration-300 ease-in-out ${activeIndex === index ? 'block' : 'hidden'}`}
+                            className={`mt-3 px-6 py-4 bg-blue-100 text-gray-700 rounded-lg shadow-md transition-all duration-300 ease-in-out ${activeIndex === index ? 'block' : 'hidden'}`}
                         >
                             {item.answer}
                         </div>

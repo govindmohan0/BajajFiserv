@@ -21,11 +21,11 @@ const Login_Client = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Left Section */}
-      <div className="lg:w-1/2 w-full relative flex items-center justify-center">
+      <div className="lg:w-1/2 w-full relative flex items-center justify-center overflow-hidden">
         <img
           src="https://imgs.search.brave.com/oU60pK62yX-ZTguQftq22nIPElZ6prwP5vJWAUQRrZU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMTM3/MzY1OTc0MC9waG90/by9zaG90LW9mLWEt/eW91bmctZG9jdG9y/LXNoYXJpbmctaW5m/b3JtYXRpb24tZnJv/bS1oaXMtZGlnaXRh/bC10YWJsZXQtd2l0/aC1hbi1vbGRlci1w/YXRpZW50LmpwZz9z/PTYxMng2MTImdz0w/Jms9MjAmYz14aS01/QmNleU5LREY5MTlv/U0szR2hlZWt1SUdU/SjVKbDNjY1dvcHo0/N0xFPQ"
           alt="Welcome"
-          className="w-full h-auto object-cover"
+          className="w-full h-full object-cover"
         />
         {/* Text Overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center bg-black bg-opacity-40">
@@ -36,8 +36,8 @@ const Login_Client = () => {
       </div>
 
       {/* Right Section - Login Form */}
-      <div className="lg:w-1/2 w-full flex items-center justify-center bg-gray-100 py-12 lg:py-0">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <div className="lg:w-1/2 w-full flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-2xl lg:text-3xl font-semibold text-blue-600 mb-6">Login to your account</h2>
 
           {/* Form */}
@@ -112,7 +112,7 @@ const Login_Client = () => {
           <div className="text-center mt-6">
             <p className="text-blue-600">
               Don’t have an account?{' '}
-              <a href="#" className="font-semibold hover:underline">Sign up</a>.
+              <a href="/signup-client" className="font-semibold hover:underline">Sign up</a>.
             </p>
           </div>
         </div>

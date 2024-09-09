@@ -31,7 +31,7 @@ const Navbar = () => {
         </li>
         <li>
           <Link
-            to="/testimonials"
+            to="/tests"
             className="nav-link text-blue-500 font-semibold hover:text-blue-600 transition duration-300"
           >
             Tests

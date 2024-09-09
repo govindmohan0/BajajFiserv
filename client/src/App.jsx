@@ -15,6 +15,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/Auth/ProtectedRoute'; // Ensure the path is correct
 import GetStarted from './components/GetStarted';
 import Login_Client from './components/Auth/Login_Client';
+import Signupclient from './components/Auth/Signupclient';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="*" element={<Notfound />} />
           <Route path="/login-admin" element={<Login />} />
           <Route path="/getstarted" element={<GetStarted />} />
+          <Route path="/signup-client" element={<Signupclient/>} />
           <Route path="/login-client" element={<Login_Client />} />
           <Route
             path="/admin"

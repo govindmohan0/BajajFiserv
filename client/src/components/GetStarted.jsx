@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 
 const GetStarted = () => {
   return (
-    <div className="flex h-screen bg-gradient-to-r from-green-100 to-white">
+    <div className="flex h-screen bg-gradient-to-r from-green-100 to-white overflow-hidden">
       {/* For Client Section */}
-      <div className="flex-1 flex flex-col items-center justify-center bg-white px-8 py-16 shadow-lg">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white px-8 py-16 shadow-lg h-full">
         <h3 className="text-blue-600 font-bold text-xs uppercase mb-2">Client</h3>
         <h2 className="text-4xl font-bold text-gray-900 mb-4">For Clients</h2>
-        <p className="text-center text-gray-600 mb-6 max-w-md">
+        <p className="text-center text-gray-600 mb-6 max-w-md ">
           Access our platform to manage your Medical bills, collaborate with company, and track progress in real-time.
         </p>
         <Link
@@ -31,7 +31,7 @@ const GetStarted = () => {
       </div>
 
       {/* For Admin Section */}
-      <div className="flex-1 flex flex-col items-center justify-center bg-white px-8 py-16 shadow-lg">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white px-8 py-16 shadow-lg h-full">
         <h3 className="text-blue-600 font-bold text-xs uppercase mb-2">Admin</h3>
         <h2 className="text-4xl font-bold text-gray-900 mb-4">For Admins</h2>
         <p className="text-center text-gray-600 mb-6 max-w-md">
@@ -45,7 +45,7 @@ const GetStarted = () => {
         </Link>
         <div className="text-center mt-4">
           <p className="text-gray-600">Don’t have an account?</p>
-          <Link to="/signup-admin" className="text-blue-500 font-bold">
+          <Link to="#" className="text-blue-500 font-bold">
             Request admin access.
           </Link>
         </div>
