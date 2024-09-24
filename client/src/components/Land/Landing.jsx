@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Services from './Services';
 import InvestmentBazaar from '../Investment';
-
+import Uploadclient from '../Uploadclient';
 const Landing = () => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -33,7 +33,7 @@ const Landing = () => {
             Unlock the potential of good advice and smart investments.
           </motion.p>
           <Link
-            to="/getstarted"
+            to="/upload"
             className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
           >
             Get started
